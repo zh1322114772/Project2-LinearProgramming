@@ -14,7 +14,7 @@ def ComputeSimplex(c, Aeq, beq, b=None):
     
 
 def PartA():
-    #A. Run your code (or tool) on the example LP problem instance from the lecture on Simplex (n=4, m=2)
+    # A. Run your code (or tool) on the example LP problem instance from the lecture on Simplex (n=4, m=2)
     c = np.array([7, 4, 6, 1])
     A = np.array([[1, 2, -1, -1], [-1, -5, 2, 3]])
     b = np.array([1, 1])
@@ -67,6 +67,10 @@ def PartB():
                     print(f"Failed to solve LP for n={n}, m={m}. Retrying...")
             
     return ret
+
+def graph_results(df):
+    pass
+
 
 if __name__ == "__main__":
     PartA()
