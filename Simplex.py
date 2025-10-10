@@ -70,7 +70,7 @@ def PartB():
             
     return ret
 
-def graph_params_vs_n(df, m, filepath="plots\\params_vs_n"):
+def graph_params_vs_n(df, m, filepath="outputs\\plots"):
     filtered_df = df[df['m'] == m]
 
     n_list = filtered_df['n']
@@ -92,13 +92,20 @@ def graph_params_vs_n(df, m, filepath="plots\\params_vs_n"):
     ax2.set_ylabel(time_label)
     time_plot, = ax2.plot(n_list, times_list, color="blue")
 
-    fig.legend([pivot_plot, time_plot], [pivot_label, time_label], bbox_to_anchor=(.88, .25))
+    fig.legend([pivot_plot, time_plot], [pivot_label, time_label], bbox_to_anchor=(.85, .25))
     fig.tight_layout()
 
     if not os.path.isdir(filepath):
         os.makedirs(filepath)
     plt.savefig("{}\\{}.png".format(filepath, title))
 
+def create_results_csv(df, title='tabulation', filepath="outputs\\tables"):
+    stats = pd.DataFrame(df)
+
+    if not os.path.isdir(filepath):
+        os.makedirs(filepath)
+
+    stats.to_csv('{}\\{}.csv'.format(filepath, title), index=False)
 
 def graph_results(df):
     m_list = list(set(df['m']))
@@ -115,5 +122,6 @@ if __name__ == "__main__":
     print(results)
 
     graph_results(results)
+    create_results_csv(results)
 
 
