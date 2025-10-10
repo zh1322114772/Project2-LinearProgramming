@@ -35,7 +35,7 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
-def PartB():
+def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
     thus:
@@ -48,8 +48,8 @@ def PartB():
 
     ret = pd.DataFrame(columns=['n', 'm', 'Time elapsed (s)', 'Number of pivots'])
 
-    for n in [2, 10, 20, 30, 40, 50]:
-        for m in [2, 6, 10, 14]:
+    for n in n_list:
+        for m in m_list:
 
             while True:
 
