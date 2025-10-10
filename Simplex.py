@@ -75,21 +75,24 @@ def graph_params_vs_n(df, m, filepath="plots\\params_vs_n"):
 
     n_list = filtered_df['n']
     pivot_list = filtered_df['Number of pivots']
+    pivot_label = 'Pivot Count'
+
     times_list = [np.round((t * 1000), 4) for t in filtered_df['Time elapsed (s)']]
+    time_label = 'Time elapsed (ms)'
 
     fig, ax1 = plt.subplots()
     title = "Pivot Count and Runtime with m={} vs n".format(m)
     plt.title(title)
     ax1.set_xlabel('n')
     
-    ax1.set_ylabel("Pivot Count")
-    ax1.plot(n_list, pivot_list, color="red")
+    ax1.set_ylabel(pivot_label)
+    pivot_plot, = ax1.plot(n_list, pivot_list, color="red")
 
     ax2 = ax1.twinx()
-    ax2.set_ylabel('Time elapsed (ms)')
-    ax2.plot(n_list, times_list, color="blue")
+    ax2.set_ylabel(time_label)
+    time_plot, = ax2.plot(n_list, times_list, color="blue")
 
-    fig.legend()
+    fig.legend([pivot_plot, time_plot], [pivot_label, time_label], bbox_to_anchor=(.88, .25))
     fig.tight_layout()
 
     if not os.path.isdir(filepath):
