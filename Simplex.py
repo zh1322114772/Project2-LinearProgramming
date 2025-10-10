@@ -1,6 +1,8 @@
 import scipy.optimize as opt
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import os
 import time
 
 def ComputeSimplex(c, Aeq, beq, b=None):
@@ -68,8 +70,32 @@ def PartB():
             
     return ret
 
+def graph_params_vs_n(df, m, filepath="plots\\params_vs_n"):
+    filtered_df = df[df['m'] == m]
+
+    n_list = filtered_df['n']
+    times_list = filtered_df['Time elapsed (s)']
+    pivot_list = filtered_df['Number of pivots']
+
+    plt.figure()
+    title = "Pivot Count and Runtime with m={} vs n".format(m)
+    plt.title(title)
+    plt.xlabel("n")
+    plt.ylabel("Pivot Count")
+
+    plt.plot(n_list, pivot_list, color="red")
+
+    if not os.path.isdir(filepath):
+        os.makedirs(filepath)
+    plt.savefig("{}\\{}.png".format(filepath, title))
+
+
 def graph_results(df):
-    pass
+    m_list = list(set(df['m']))
+    m_list.sort()
+    
+    for m in m_list:
+        graph_params_vs_n(df, m)
 
 
 if __name__ == "__main__":
@@ -78,5 +104,6 @@ if __name__ == "__main__":
     results = PartB()
     print(results)
 
+    graph_results(results)
 
 
