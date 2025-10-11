@@ -1,6 +1,8 @@
 import scipy.optimize as opt
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import os
 import time
 
 def ComputeSimplex(c, Aeq, beq, b=None):
@@ -14,7 +16,7 @@ def ComputeSimplex(c, Aeq, beq, b=None):
     
 
 def PartA():
-    #A. Run your code (or tool) on the example LP problem instance from the lecture on Simplex (n=4, m=2)
+    # A. Run your code (or tool) on the example LP problem instance from the lecture on Simplex (n=4, m=2)
     c = np.array([7, 4, 6, 1])
     A = np.array([[1, 2, -1, -1], [-1, -5, 2, 3]])
     b = np.array([1, 1])
@@ -33,7 +35,7 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
-def PartB():
+def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
     thus:
@@ -46,8 +48,8 @@ def PartB():
 
     ret = pd.DataFrame(columns=['n', 'm', 'Time elapsed (s)', 'Number of pivots'])
 
-    for n in [2, 10, 20, 30, 40, 50]:
-        for m in [2, 6, 10, 14]:
+    for n in n_list:
+        for m in m_list:
 
             while True:
 
@@ -68,11 +70,59 @@ def PartB():
             
     return ret
 
+def graph_params_vs_n(df, m, filepath="outputs\\plots"):
+    filtered_df = df[df['m'] == m]
+
+    n_list = filtered_df['n']
+    pivot_list = filtered_df['Number of pivots']
+    times_list = [np.round((t * 1000), 4) for t in filtered_df['Time elapsed (s)']]
+
+    fig, ax1 = plt.subplots()
+    title = "Pivot Count and Runtime with m={} vs n".format(m)
+    plt.title(title)
+    ax1.set_xlabel('n')
+    
+    pivot_color = "red"
+    ax1.set_ylabel('Pivot Count', color=pivot_color)
+    ax1.tick_params(axis='y', labelcolor=pivot_color)
+    ax1.plot(n_list, pivot_list, color=pivot_color)
+
+    ax2 = ax1.twinx()
+
+    time_color = "blue"
+    ax2.set_ylabel('Time elapsed (ms)', color=time_color)
+    ax2.tick_params(axis='y', labelcolor=time_color)
+    ax2.plot(n_list, times_list, color=time_color)
+
+    fig.tight_layout()
+
+    if not os.path.isdir(filepath):
+        os.makedirs(filepath)
+    plt.savefig("{}\\{}.png".format(filepath, title))
+
+def create_results_csv(df, title='tabulation', filepath="outputs\\tables"):
+    stats = pd.DataFrame(df)
+
+    if not os.path.isdir(filepath):
+        os.makedirs(filepath)
+
+    stats.to_csv('{}\\{}.csv'.format(filepath, title), index=False)
+
+def graph_results(df):
+    m_list = list(set(df['m']))
+    m_list.sort()
+    
+    for m in m_list:
+        graph_params_vs_n(df, m)
+
+
 if __name__ == "__main__":
     PartA()
 
     results = PartB()
     print(results)
 
+    graph_results(results)
+    create_results_csv(results)
 
 
