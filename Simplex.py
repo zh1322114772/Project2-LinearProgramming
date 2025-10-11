@@ -35,6 +35,15 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
+def avg_time(func, *args, n_trials=20):
+    times = []
+    for _ in range(n_trials):
+        start = time.time()
+        func(*args)
+        end = time.time()
+        times.append(end - start)
+    return np.mean(times)
+
 def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
@@ -57,10 +66,8 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
                 c, A, b, bounds = random_feasible_lp(n, m)
 
                 try:
-                    start = time.time()
                     solution = ComputeSimplex(c, A, b, bounds)
-                    end = time.time()
-                    elapsed = end - start
+                    elapsed = avg_time(ComputeSimplex, c, A, b, bounds)
 
                     ret.loc[len(ret)] = [n, m, elapsed, solution.nit]
 
