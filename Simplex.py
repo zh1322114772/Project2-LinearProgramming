@@ -55,7 +55,7 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
 
     '''
 
-    ret = pd.DataFrame(columns=['n', 'm', 'Time elapsed (s)', 'Number of pivots'])
+    ret = pd.DataFrame(columns=['n', 'm', 'Time elapsed (s)', 'Number of pivots', 'Cost'])
 
     for n in n_list:
         for m in m_list:
@@ -69,7 +69,7 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
                     solution = ComputeSimplex(c, A, b, bounds)
                     elapsed = avg_time(ComputeSimplex, c, A, b, bounds)
 
-                    ret.loc[len(ret)] = [n, m, elapsed, solution.nit]
+                    ret.loc[len(ret)] = [n, m, elapsed, solution.nit, solution.fun]
 
                     break
                 except ValueError as e:
