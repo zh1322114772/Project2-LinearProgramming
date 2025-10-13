@@ -90,7 +90,7 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
     fig, ax1 = plt.subplots()
     title = "Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
     plt.title(title)
-    ax1.set_xlabel('n')
+    ax1.set_xlabel(changing_var)
     
     pivot_color = "red"
     ax1.set_ylabel('Pivot Count', color=pivot_color)
