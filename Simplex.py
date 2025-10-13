@@ -95,14 +95,14 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
     pivot_color = "red"
     ax1.set_ylabel('Pivot Count', color=pivot_color)
     ax1.tick_params(axis='y', labelcolor=pivot_color)
-    ax1.plot(x_list, pivot_list, color=pivot_color)
+    ax1.plot(x_list, pivot_list, color=pivot_color, marker='o')
 
     ax2 = ax1.twinx()
 
     time_color = "blue"
     ax2.set_ylabel('Time elapsed (ms)', color=time_color)
     ax2.tick_params(axis='y', labelcolor=time_color)
-    ax2.plot(x_list, times_list, color=time_color)
+    ax2.plot(x_list, times_list, color=time_color, marker='o')
 
     fig.tight_layout()
 
