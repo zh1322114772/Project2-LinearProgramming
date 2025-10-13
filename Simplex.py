@@ -35,7 +35,7 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
-def avg_time(func, *args, n_trials=20):
+def avg_time(func, *args, n_trials=50):
     times = []
     for _ in range(n_trials):
         start = time.time()
@@ -77,29 +77,32 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
             
     return ret
 
-def graph_params_vs_n(df, m, filepath="outputs\\plots"):
-    filtered_df = df[df['m'] == m]
+def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plots"):
+    assert(const_var == 'n' or const_var == 'm')
+    changing_var = 'n' if const_var == 'm' else 'm'
 
-    n_list = filtered_df['n']
+    filtered_df = df[df[const_var] == const_val]
+
+    x_list = filtered_df[changing_var]
     pivot_list = filtered_df['Number of pivots']
     times_list = [np.round((t * 1000), 4) for t in filtered_df['Time elapsed (s)']]
 
     fig, ax1 = plt.subplots()
-    title = "Pivot Count and Runtime with m={} vs n".format(m)
+    title = "Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
     plt.title(title)
     ax1.set_xlabel('n')
     
     pivot_color = "red"
     ax1.set_ylabel('Pivot Count', color=pivot_color)
     ax1.tick_params(axis='y', labelcolor=pivot_color)
-    ax1.plot(n_list, pivot_list, color=pivot_color)
+    ax1.plot(x_list, pivot_list, color=pivot_color)
 
     ax2 = ax1.twinx()
 
     time_color = "blue"
     ax2.set_ylabel('Time elapsed (ms)', color=time_color)
     ax2.tick_params(axis='y', labelcolor=time_color)
-    ax2.plot(n_list, times_list, color=time_color)
+    ax2.plot(x_list, times_list, color=time_color)
 
     fig.tight_layout()
 
@@ -116,11 +119,17 @@ def create_results_csv(df, title='tabulation', filepath="outputs\\tables"):
     stats.to_csv('{}\\{}.csv'.format(filepath, title), index=False)
 
 def graph_results(df):
+    n_list = list(set(df['n']))
+    n_list.sort()
+
     m_list = list(set(df['m']))
     m_list.sort()
-    
+
+    for n in n_list:
+        graph_params_vs_n_or_m(df, const_val=n, const_var='n', filepath="outputs\\plots\\vs_m")
+
     for m in m_list:
-        graph_params_vs_n(df, m)
+        graph_params_vs_n_or_m(df, const_val=m, const_var='m', filepath="outputs\\plots\\vs_n")
 
 
 if __name__ == "__main__":
