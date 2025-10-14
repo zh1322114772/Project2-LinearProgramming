@@ -95,7 +95,7 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
     times_list = [np.round((t * 1000), 4) for t in filtered_df['Time elapsed (s)']]
 
     fig, ax1 = plt.subplots()
-    title = "Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
+    title = "Average Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
     plt.title(title)
     ax1.set_xlabel(changing_var)
     
