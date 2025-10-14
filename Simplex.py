@@ -144,7 +144,7 @@ if __name__ == "__main__":
     PartA()
 
     # use trials = 1 just to create a csv
-    single_results = PartB(lp_trials=1, time_trials=50)
+    single_results = PartB(lp_trials=1)
     print(single_results)
     create_results_csv(single_results)
 
