@@ -44,7 +44,7 @@ def avg_time(func, *args, n_trials=20):
         times.append(end - start)
     return np.mean(times)
 
-def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1):
+def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1, time_trials=20):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
     thus:
@@ -70,7 +70,7 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1):
 
                     try:
                         solution = ComputeSimplex(c, A, b, bounds)
-                        elapsed = avg_time(ComputeSimplex, c, A, b, bounds)
+                        elapsed = avg_time(ComputeSimplex, c, A, b, bounds, n_trials=time_trials)
 
                         pivots.append(solution.nit)
                         times.append(elapsed)
@@ -113,7 +113,7 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
 
     fig.tight_layout()
 
-    filename = "{}={}_vs_{}.png".format(const_var, int(const_val), changing_var)
+    filename = "{}={}_vs_{}.png".format(const_var, const_val, changing_var)
     if not os.path.isdir(filepath):
         os.makedirs(filepath)
     plt.savefig("{}\\{}".format(filepath, filename))
@@ -144,10 +144,10 @@ if __name__ == "__main__":
     PartA()
 
     # use trials = 1 just to create a csv
-    single_results = PartB(lp_trials=1)
+    single_results = PartB(lp_trials=1, time_trials=50)
     print(single_results)
     create_results_csv(single_results)
 
     # use trials = 200 so that we can get an average pivot count among many randomly generated LP problems
-    avg_results = PartB(lp_trials=200)
+    avg_results = PartB(lp_trials=200, time_trials=1)
     graph_results(avg_results)
