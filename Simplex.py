@@ -87,6 +87,7 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1, ti
 def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plots"):
     assert(const_var == 'n' or const_var == 'm')
     changing_var = 'n' if const_var == 'm' else 'm'
+    const_val = int(const_val)
 
     filtered_df = df[df[const_var] == const_val]
 
