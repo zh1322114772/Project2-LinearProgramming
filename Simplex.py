@@ -7,7 +7,7 @@ import time
 
 def ComputeSimplex(c, Aeq, beq, b=None):
 
-    res = opt.linprog(c, A_eq = Aeq, b_eq = beq, bounds = b, method='highs')
+    res = opt.linprog(c, A_eq = Aeq, b_eq = beq, bounds = b, method='simplex')
 
     if res.success:
         return res
