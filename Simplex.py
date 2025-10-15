@@ -7,7 +7,7 @@ import time
 
 def ComputeSimplex(c, Aeq, beq, b=None):
 
-    res = opt.linprog(c, A_eq = Aeq, b_eq = beq, bounds = b, method='highs')
+    res = opt.linprog(c, A_eq = Aeq, b_eq = beq, bounds = b, method='simplex')
 
     if res.success:
         return res
@@ -35,7 +35,7 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
-def avg_time(func, *args, n_trials=50):
+def avg_time(func, *args, n_trials=20):
     times = []
     for _ in range(n_trials):
         start = time.time()
@@ -44,7 +44,7 @@ def avg_time(func, *args, n_trials=50):
         times.append(end - start)
     return np.mean(times)
 
-def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
+def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1, time_trials=20):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
     thus:
@@ -60,26 +60,34 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14]):
     for n in n_list:
         for m in m_list:
 
-            while True:
+            pivots = []
+            times = []
+            cost = 0
+            for _ in range(lp_trials):
+                while True:
+                    # Generate random LP problem
+                    c, A, b, bounds = random_feasible_lp(n, m)
 
-                # Generate random LP problem
-                c, A, b, bounds = random_feasible_lp(n, m)
+                    try:
+                        solution = ComputeSimplex(c, A, b, bounds)
+                        elapsed = avg_time(ComputeSimplex, c, A, b, bounds, n_trials=time_trials)
 
-                try:
-                    solution = ComputeSimplex(c, A, b, bounds)
-                    elapsed = avg_time(ComputeSimplex, c, A, b, bounds)
+                        pivots.append(solution.nit)
+                        times.append(elapsed)
+                        cost = solution.fun
 
-                    ret.loc[len(ret)] = [n, m, elapsed, solution.nit, solution.fun]
-
-                    break
-                except ValueError as e:
-                    print(f"Failed to solve LP for n={n}, m={m}. Retrying...")
+                        break
+                    except ValueError as e:
+                        print(f"Failed to solve LP for n={n}, m={m}. Retrying...")
+ 
+            ret.loc[len(ret)] = [n, m, np.average(times), np.average(pivots), cost]
             
     return ret
 
 def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plots"):
     assert(const_var == 'n' or const_var == 'm')
     changing_var = 'n' if const_var == 'm' else 'm'
+    const_val = int(const_val)
 
     filtered_df = df[df[const_var] == const_val]
 
@@ -88,7 +96,7 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
     times_list = [np.round((t * 1000), 4) for t in filtered_df['Time elapsed (s)']]
 
     fig, ax1 = plt.subplots()
-    title = "Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
+    title = "Average Pivot Count and Runtime with {}={} vs {}".format(const_var, const_val, changing_var)
     plt.title(title)
     ax1.set_xlabel(changing_var)
     
@@ -106,9 +114,10 @@ def graph_params_vs_n_or_m(df, const_val, const_var='m', filepath="outputs\\plot
 
     fig.tight_layout()
 
+    filename = "{}={}_vs_{}.png".format(const_var, const_val, changing_var)
     if not os.path.isdir(filepath):
         os.makedirs(filepath)
-    plt.savefig("{}\\{}.png".format(filepath, title))
+    plt.savefig("{}\\{}".format(filepath, filename))
 
 def create_results_csv(df, title='tabulation', filepath="outputs\\tables"):
     stats = pd.DataFrame(df)
@@ -135,10 +144,11 @@ def graph_results(df):
 if __name__ == "__main__":
     PartA()
 
-    results = PartB()
-    print(results)
+    # use trials = 1 just to create a csv
+    single_results = PartB(lp_trials=1)
+    print(single_results)
+    create_results_csv(single_results)
 
-    graph_results(results)
-    create_results_csv(results)
-
-
+    # use trials = 200 so that we can get an average pivot count among many randomly generated LP problems
+    avg_results = PartB(lp_trials=200, time_trials=1)
+    graph_results(avg_results)
