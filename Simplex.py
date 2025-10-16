@@ -35,16 +35,31 @@ def random_feasible_lp(n, m, U=100.0, rng=None):
     bounds = [(0.0, U)] * n
     return c, A_eq, b_eq, bounds
 
-def avg_time(func, *args, n_trials=20):
+def run_experiment(n, m, lp_trials=1):
     times = []
-    for _ in range(n_trials):
-        start = time.time()
-        func(*args)
-        end = time.time()
-        times.append(end - start)
-    return np.mean(times)
+    pivots = []
+    costs = []
 
-def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1, time_trials=20):
+    for _ in range(lp_trials):
+        while True:
+            try:
+                c, A, b, bounds = random_feasible_lp(n, m)
+
+                start = time.time()
+                solution = ComputeSimplex(c, A, b, bounds)
+                end = time.time()
+
+                pivots.append(solution.nit)
+                times.append(end - start)
+                costs.append(solution.fun)
+
+                break
+            except ValueError as e:
+                print(f"Failed to solve LP for n={n}, m={m}. Retrying...")
+
+    return [n, m, np.average(times), np.average(pivots), costs[0]]
+
+def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1):
     '''
     B. Next try to increase the number of variables (n) and increase the number of constraints (m),
     thus:
@@ -59,28 +74,7 @@ def PartB(n_list=[2, 10, 20, 30, 40, 50], m_list=[2, 6, 10, 14], lp_trials=1, ti
 
     for n in n_list:
         for m in m_list:
-
-            pivots = []
-            times = []
-            cost = 0
-            for _ in range(lp_trials):
-                while True:
-                    # Generate random LP problem
-                    c, A, b, bounds = random_feasible_lp(n, m)
-
-                    try:
-                        solution = ComputeSimplex(c, A, b, bounds)
-                        elapsed = avg_time(ComputeSimplex, c, A, b, bounds, n_trials=time_trials)
-
-                        pivots.append(solution.nit)
-                        times.append(elapsed)
-                        cost = solution.fun
-
-                        break
-                    except ValueError as e:
-                        print(f"Failed to solve LP for n={n}, m={m}. Retrying...")
- 
-            ret.loc[len(ret)] = [n, m, np.average(times), np.average(pivots), cost]
+            ret.loc[len(ret)] = run_experiment(n, m, lp_trials=lp_trials)
             
     return ret
 
@@ -149,6 +143,6 @@ if __name__ == "__main__":
     print(single_results)
     create_results_csv(single_results)
 
-    # use trials = 200 so that we can get an average pivot count among many randomly generated LP problems
-    avg_results = PartB(lp_trials=200, time_trials=1)
+    # use trials = 200 so that we can get an average pivot count and time elapsed among many randomly generated LP problems
+    avg_results = PartB(lp_trials=200)
     graph_results(avg_results)
